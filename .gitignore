@@ -1,1 +1,3 @@
 .idea/*
+/advent23/target/
+.DS_STORE
