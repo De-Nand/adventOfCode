@@ -1,13 +1,14 @@
 use std::fs::File;
 use advent23::day_one::calculate_result;
 use advent23::day_two::calculate_valid_games;
+use advent23::day_three::calculate_day_three;
 
 fn main() {
     println!("Hello, world!");
 
-    let puzzle_input: String = String::from("puzzle_two_input.txt");
+    let puzzle_input: String = String::from("puzzle_three_sample.txt");
     let debug: bool = true;
-    let puzzle_day = 2;
+    let puzzle_day = 3;
 
     let read_result = read_file(puzzle_input);
 
@@ -16,6 +17,7 @@ fn main() {
             match puzzle_day {
                 1 => println!("Final result = {}", calculate_result(file, debug)),
                 2 => println!("Result = {}", calculate_valid_games(file, debug)),
+                3 => println!("Result = {}", calculate_day_three(file, debug)),
                 _ => println!("No valid day selected")
             }
 

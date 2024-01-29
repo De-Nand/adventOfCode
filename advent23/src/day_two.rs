@@ -5,7 +5,8 @@ use std::io::{BufRead, BufReader};
 struct DiceSet {
     r: usize,
     g: usize,
-    b: usize
+    b: usize,
+    power: usize
 }
 
 const RED_COUNT: usize = 12;
@@ -18,7 +19,8 @@ pub fn calculate_valid_games(file: File, debug: bool) -> u64 {
     let mut final_result: u64 = 0;
 
     for line in file_lines.flatten() {
-        final_result += is_game_valid(line, debug);
+        // final_result += is_game_valid(line, debug);
+        final_result += get_total_power_of_mins(line, debug);
     }
 
     return final_result;
@@ -31,9 +33,6 @@ fn is_game_valid(line: String, debug: bool) -> u64 {
 
     let game_data:Vec<&str> = line.split(":").collect();
 
-    //let aggregate_dice = get_aggregated_set(String::from(game_data[1]), debug);
-
-    //if aggregate_dice.r <= RED_COUNT && aggregate_dice.b <= BLUE_COUNT && aggregate_dice.g < GREEN_COUNT {
     if is_each_subset_valid(String::from(game_data[1]), debug) {
         if debug {
             println!("Valid game: {:?}" , &line);
@@ -45,8 +44,19 @@ fn is_game_valid(line: String, debug: bool) -> u64 {
             println!("invalid game: {:?}" , &line);
         }
     }
-
     return 0;
+}
+
+fn get_total_power_of_mins(line: String, debug: bool) -> u64 {
+    let game_data:Vec<&str> = line.split(":").collect();
+
+    let minimums = get_minimum_set(String::from(game_data[1]), debug);
+
+    if debug {
+        println!("Minimum set is: {:?}", &minimums );
+    }
+
+    return minimums.power.to_owned() as u64;
 }
 
 fn is_each_subset_valid(game_data: String, debug: bool) -> bool {
@@ -89,11 +99,12 @@ fn is_each_subset_valid(game_data: String, debug: bool) -> bool {
     return true;
 }
 
-fn get_aggregated_set(game_data: String, debug: bool) -> DiceSet {
+fn get_minimum_set(game_data: String, debug: bool) -> DiceSet {
     let mut result = DiceSet {
         r: 0,
         g: 0,
-        b: 0
+        b: 0,
+        power: 0
     };
 
     let games_played: Vec<&str> = game_data.split(";").collect();
@@ -110,14 +121,28 @@ fn get_aggregated_set(game_data: String, debug: bool) -> DiceSet {
             }
 
             match dice_count[1] {
-                "blue" => result.b += dice_count[0].parse::<usize>().unwrap(),
-                "red" => result.r += dice_count[0].parse::<usize>().unwrap(),
-                "green" => result.g += dice_count[0].parse::<usize>().unwrap(),
+                "blue" => {
+                    if dice_count[0].parse::<usize>().unwrap() > result.b {
+                        result.b = dice_count[0].parse::<usize>().unwrap();
+                    }
+                },
+                "red" => {
+                    if dice_count[0].parse::<usize>().unwrap() > result.r {
+                        result.r = dice_count[0].parse::<usize>().unwrap();
+                    }
+                },
+                "green" => {
+                    if dice_count[0].parse::<usize>().unwrap() > result.g {
+                        result.g = dice_count[0].parse::<usize>().unwrap();
+                    }
+                },
                 _ => println!("Found an unknown color {}", dice_count[1])
             }
         }
 
     }
+
+    result.power = result.b * result.g * result.r;
 
     if debug {
         println!("Counts: {:?}", &result);
