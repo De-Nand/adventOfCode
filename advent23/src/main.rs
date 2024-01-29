@@ -5,8 +5,8 @@ use advent23::day_two::calculate_valid_games;
 fn main() {
     println!("Hello, world!");
 
-    let puzzle_input: String = String::from("puzzle_two_sample.txt");
-    let debug: bool = false;
+    let puzzle_input: String = String::from("puzzle_two_input.txt");
+    let debug: bool = true;
     let puzzle_day = 2;
 
     let read_result = read_file(puzzle_input);
