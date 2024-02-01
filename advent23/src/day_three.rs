@@ -24,38 +24,63 @@ pub fn calculate_day_three(file: File, debug: bool) -> u64 {
     return final_result;
 }
 
+/***
+Issues observed.
+
+1. Last elements are not properly handled
+ */
 fn calculate_row_value(previous: Option<&String>, current: &String, next: Option<&String>, debug: bool) -> u64 {
 
     let mut row_total: u64 = 0;
-    let mut start_index = 0;
-    let mut end_index = 0;
+
+    let mut start_index:usize = 0;
+    let mut integer_start:usize = 0;
+    let mut integer_end:usize = 0;
+    let mut end_index:usize = 0;
+    let mut skip_count:usize = 0;
 
     //iterate through current until first digit
     let row_chars:Vec<char> = current.chars().collect();
 
     for char in 0..row_chars.len() {
+
+        if skip_count > 0 {
+            skip_count -= 1;
+            continue;
+        }
+
         if row_chars.get(char).unwrap().is_digit(10) {
             // find the length of the number
+            integer_start = char;
             if char > 0 {
-                start_index = char -1;
+                start_index = integer_start -1;
             }
+
             for i in 0..5 {
                 if !(row_chars.get(char + i).unwrap().is_digit(10)) {
                     break;
                 }
-                end_index = char + i;
+                integer_end = char + i;
+                skip_count += 1;
             }
             // find start and end indexes (start-1, end+1) for diagonal
-            end_index += 1;
-            // search previous and next for any symbols
-            if are_symbols_on_row(previous, start_index, end_index) || are_symbols_on_row(next, start_index, end_index) {
-                row_total += 0; //Actual number found
+            if integer_end < (row_chars.len() -1) {
+                end_index = integer_end + 1;
             }
-            // if yes, return the number, else 0
-
+            // search previous and next for any symbols
+            if are_symbols_on_row(previous, start_index, end_index) ||
+                are_symbols_on_row(Some(current), start_index, end_index) ||
+                are_symbols_on_row(next, start_index, end_index) {
+                // Since we have the number, add it to the running total
+                let actual_number_chars = &row_chars[(integer_start)..=(integer_end)];
+                let string_rep: String = actual_number_chars.iter().collect();
+                if debug { println!("Adding: {}", string_rep); }
+                row_total += String::from(string_rep).parse::<u64>().unwrap();
+            }
+            // if no, return 0
+            row_total += 0; //Actual number found
         }
     }
-
 
     return row_total;
 }
