@@ -7,7 +7,7 @@ fn main() {
     println!("Hello, world!");
 
     let puzzle_input: String = String::from("puzzle_three_sample.txt");
-    let debug: bool = true;
+    let debug: bool = false;
     let puzzle_day = 3;
 
     let read_result = read_file(puzzle_input);
