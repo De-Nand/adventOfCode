@@ -6,8 +6,8 @@ use advent23::day_three::calculate_day_three;
 fn main() {
     println!("Hello, world!");
 
-    let puzzle_input: String = String::from("puzzle_three_sample.txt");
-    let debug: bool = false;
+    let puzzle_input: String = String::from("puzzle_three_sample_edge_cases.txt");
+    let debug: bool = true;
     let puzzle_day = 3;
 
     let read_result = read_file(puzzle_input);

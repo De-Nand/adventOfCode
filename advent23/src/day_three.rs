@@ -11,14 +11,14 @@ pub fn calculate_day_three(file: File, debug: bool) -> u64 {
     let list:Vec<String> = file_lines.flatten().collect();
 
     for line in 0..list.len() {
-        println!("Looking at: {:?}", &list.get(line));
+        if debug { println!("Looking at: {:?}", &list.get(line)); }
 
         if line == 0 {
-            final_result += calculate_row_value(None, &list[line], Some(&list[line+1]), debug);
+            final_result += calculate_gear_ratio(None, &list[line], Some(&list[line+1]), debug);
         } else if line == list.len() -1 {
-            final_result += calculate_row_value(Some(&list[line-1]), &list[line], None, debug);
+            final_result += calculate_gear_ratio(Some(&list[line-1]), &list[line], None, debug);
         } else {
-            final_result += calculate_row_value(Some(&list[line-1]), &list[line], Some(&list[line+1]), debug);
+            final_result += calculate_gear_ratio(Some(&list[line-1]), &list[line], Some(&list[line+1]), debug);
         }
     }
 
@@ -35,9 +35,9 @@ fn calculate_gear_ratio(previous: Option<&String>, current: &String, next: Optio
     let mut symbol_index_start:usize = 0;
     let mut symbol_index_end:usize = 0;
     let mut numbers_found: i8 = 0;
-    let mut num_one: usize = 1;
-    let mut num_two: usize = 1;
-    let mut num_three: usize = 1;
+    let mut num_one: u64 = 1;
+    let mut num_two: u64 = 1;
+    let mut num_three: u64 = 1;
 
     //iterate through current until first digit
     let row_chars:Vec<char> = current.chars().collect();
@@ -49,40 +49,99 @@ fn calculate_gear_ratio(previous: Option<&String>, current: &String, next: Optio
 
         if row_chars[char] == '*' {
             // Need to see if it is connected on all sides to a number (is_digit)
-            if is_number_nearby(previous, symbol_index_start, (char+1)) {
-                numbers_found += 1;
-            }
-            if is_number_nearby(Some(current), symbol_index_start, (char+1)) {
-                numbers_found += 1;
-            }
-            if is_number_nearby(next, symbol_index_start, (char+1)) {} {
-                numbers_found += 1;
-            }
-        }
+            let top = is_number_nearby(previous, symbol_index_start, debug); //top row
+            let mid = is_number_nearby(Some(current), symbol_index_start, debug); //current row
+            let bot = is_number_nearby(next, symbol_index_start, debug); //bottom row
 
-        if numbers_found >= 2 {
-            if debug { println!("Found a gear ratio : {}, {}, {}", num_one, num_two, num_three)}
-            row_total += num_one * num_two * num_three;
+            if top.0 > 0 {
+                if debug { println!("Found {} numbers that multiply up to {}", top.0, top.1); }
+                num_one = num_one * top.1;
+                numbers_found += top.0;
+            }
+            if mid.0 > 0 {
+                if debug { println!("Found {} numbers that multiply up to {}", mid.0, mid.1); }
+                num_two = num_two * mid.1;
+                numbers_found += mid.0;
+            }
+            if bot.0 > 0 {
+                if debug { println!("Found {} numbers that multiply up to {}", bot.0, bot.1); }
+                num_three = num_three * bot.1;
+                numbers_found += bot.0;
+            }
+
+            if numbers_found >= 2 {
+                if debug { println!("Found a gear ratio : {}, {}, {}", num_one, num_two, num_three) }
+                row_total += num_one * num_two * num_three;
+            }
         }
     }
 
     return row_total;
 }
 
-fn is_number_nearby(row: Option<&String>, start: usize, end: usize) -> bool {
+fn is_number_nearby(row: Option<&String>, start: usize, debug: bool) -> (i8, u64) {
     if None == row {
-        return false;
+        return (0, 0);
     }
 
     let row_chars:Vec<char> = row.unwrap().chars().collect();
 
-    for i in start..=end {
-        if i < row_chars.len() && row_chars[i].is_digit(10) {
-            return true;
+    if row_chars[start].is_digit(10) {
+        // Only 1 number possible flow
+        let individual_res = get_number_in_range(&row_chars, start, debug);
+        if individual_res.0 {
+            return (1, individual_res.1)
+        }
+        return (0, 1);
+    } else {
+        // max 2 numbers possible flow
+        let mut count: i8 = 0;
+        let mut result: u64 = 1;
+
+        if start > 0 {
+            let left = get_number_in_range(&row_chars, (start-1), debug);
+            if left.0 {
+                result = result * left.1;
+                count += 1;
+            }
+        }
+
+        if start < row_chars.len() {
+            let right = get_number_in_range(&row_chars, (start+1), debug);
+            if right.0 {
+                result = result * right.1;
+                count += 1;
+            }
+        }
+
+        return (count, result);
+    }
+}
+
+fn get_number_in_range(row: &Vec<char>, start: usize, debug: bool) -> (bool, u64) {
+    if !(row[start].is_digit(10)) {
+        return (false, 0)
+    }
+    let mut new_start: usize = start.clone();
+    let mut new_end: usize = start.clone();
+
+    // go to the left
+    while (new_start) > 0 && row[(new_start)].is_digit(10) {
+        if new_start > 0 {
+            new_start -= 1;
         }
     }
 
-    return false;
+    // go to the right
+    while (new_end + 1)< row.len() && row[new_end + 1].is_digit(10) {
+        new_end += 1;
+    }
+
+    // Using the new index, send back the result
+    let actual_number_chars = &row[(new_start)..=(new_end)];
+    let string_rep: String = actual_number_chars.iter().collect();
+    if debug { println!("collection of digits is : {}" , &string_rep) }
+    return (true, String::from(string_rep).parse::<u64>().unwrap())
 }
 
 
