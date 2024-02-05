@@ -1,7 +1,5 @@
-use std::f32::DIGITS;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::str::Lines;
 
 pub fn calculate_day_three(file: File, debug: bool) -> u64 {
 
@@ -11,7 +9,7 @@ pub fn calculate_day_three(file: File, debug: bool) -> u64 {
     let list:Vec<String> = file_lines.flatten().collect();
 
     for line in 0..list.len() {
-        if debug { println!("Looking at: {:?}", &list.get(line)); }
+        //if debug { println!("Looking at: {:?}", &list.get(line)); }
 
         if line == 0 {
             final_result += calculate_gear_ratio(None, &list[line], Some(&list[line+1]), debug);
@@ -43,9 +41,7 @@ fn calculate_gear_ratio(previous: Option<&String>, current: &String, next: Optio
     let row_chars:Vec<char> = current.chars().collect();
 
     for char in 0..row_chars.len() {
-        if char > 0 {
-            symbol_index_start = char -1;
-        }
+        symbol_index_start = char;
 
         if row_chars[char] == '*' {
             // Need to see if it is connected on all sides to a number (is_digit)
@@ -54,25 +50,29 @@ fn calculate_gear_ratio(previous: Option<&String>, current: &String, next: Optio
             let bot = is_number_nearby(next, symbol_index_start, debug); //bottom row
 
             if top.0 > 0 {
-                if debug { println!("Found {} numbers that multiply up to {}", top.0, top.1); }
+                if debug { println!("top Found {} numbers that multiply up to {}", top.0, top.1); }
                 num_one = num_one * top.1;
                 numbers_found += top.0;
             }
             if mid.0 > 0 {
-                if debug { println!("Found {} numbers that multiply up to {}", mid.0, mid.1); }
+                if debug { println!("mid Found {} numbers that multiply up to {}", mid.0, mid.1); }
                 num_two = num_two * mid.1;
                 numbers_found += mid.0;
             }
             if bot.0 > 0 {
-                if debug { println!("Found {} numbers that multiply up to {}", bot.0, bot.1); }
+                if debug { println!("bot Found {} numbers that multiply up to {}", bot.0, bot.1); }
                 num_three = num_three * bot.1;
                 numbers_found += bot.0;
             }
 
             if numbers_found >= 2 {
-                if debug { println!("Found a gear ratio : {}, {}, {}", num_one, num_two, num_three) }
+                if debug { println!("Found a gear ratio : {}, {}, {} = {}", num_one, num_two, num_three, num_one * num_two * num_three) }
                 row_total += num_one * num_two * num_three;
             }
+            num_one = 1;
+            num_two = 1;
+            num_three = 1;
+            numbers_found = 0;
         }
     }
 
@@ -88,12 +88,14 @@ fn is_number_nearby(row: Option<&String>, start: usize, debug: bool) -> (i8, u64
 
     if row_chars[start].is_digit(10) {
         // Only 1 number possible flow
+        if debug { println!("Single number option"); }
         let individual_res = get_number_in_range(&row_chars, start, debug);
         if individual_res.0 {
             return (1, individual_res.1)
         }
         return (0, 1);
     } else {
+        if debug { println!("Multi number option"); }
         // max 2 numbers possible flow
         let mut count: i8 = 0;
         let mut result: u64 = 1;
@@ -119,22 +121,29 @@ fn is_number_nearby(row: Option<&String>, start: usize, debug: bool) -> (i8, u64
 }
 
 fn get_number_in_range(row: &Vec<char>, start: usize, debug: bool) -> (bool, u64) {
+    if debug { println!("First number is {}", row[start])}
     if !(row[start].is_digit(10)) {
-        return (false, 0)
+        return (false, 1)
     }
     let mut new_start: usize = start.clone();
     let mut new_end: usize = start.clone();
 
     // go to the left
-    while (new_start) > 0 && row[(new_start)].is_digit(10) {
-        if new_start > 0 {
+    while row[new_start].is_digit(10) {
+        if new_start > 0 && row[new_start-1].is_digit(10) {
             new_start -= 1;
+        } else {
+            break;
         }
     }
 
     // go to the right
-    while (new_end + 1)< row.len() && row[new_end + 1].is_digit(10) {
-        new_end += 1;
+    while row[new_end].is_digit(10) {
+        if new_end < row.len() && row[new_end+1].is_digit(10) {
+            new_end += 1;
+        } else {
+            break;
+        }
     }
 
     // Using the new index, send back the result
