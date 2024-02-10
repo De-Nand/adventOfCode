@@ -7,7 +7,7 @@ use advent23::day_four::calculate_day_four;
 fn main() {
     println!("Hello, world!");
 
-    let puzzle_input: String = String::from("puzzle_four_sample.txt");
+    let puzzle_input: String = String::from("puzzle_four_input.txt");
     let debug: bool = true;
     let puzzle_day = 4;
 
