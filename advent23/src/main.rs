@@ -3,13 +3,14 @@ use advent23::day_one::calculate_result;
 use advent23::day_two::calculate_valid_games;
 use advent23::day_three::calculate_day_three;
 use advent23::day_four::calculate_day_four;
+use advent23::day_five::calculate_day_five;
 
 fn main() {
     println!("Hello, world!");
 
-    let puzzle_input: String = String::from("puzzle_four_input.txt");
+    let puzzle_input: String = String::from("puzzle_five_sample.txt");
     let debug: bool = true;
-    let puzzle_day = 4;
+    let puzzle_day = 5;
 
     let read_result = read_file(puzzle_input);
 
@@ -20,6 +21,7 @@ fn main() {
                 2 => println!("Result = {}", calculate_valid_games(file, debug)),
                 3 => println!("Result = {}", calculate_day_three(file, debug)),
                 4 => println!("Result = {}", calculate_day_four(file, debug)),
+                5 => println!("Result = {}", calculate_day_five(file, debug)),
                 _ => println!("No valid day selected")
             }
 
