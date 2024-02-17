@@ -7,9 +7,9 @@ use advent23::day_five::calculate_day_five;
 
 fn main() {
     println!("Hello, world!");
-
-    let puzzle_input: String = String::from("puzzle_five_input.txt");
-    let debug: bool = false;
+//seeds: 3429320627 235304036 1147330745 114559245 1684000747 468955901 677937579 96599505 1436970021 26560102 3886049334 159534901 936845926 25265009 3247146679 95841652 3696363517 45808572 2319065313 125950148
+    let puzzle_input: String = String::from("puzzle_five_sample.txt");
+    let debug: bool = true;
     let puzzle_day = 5;
 
     let read_result = read_file(puzzle_input);
