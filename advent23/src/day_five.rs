@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader, Lines};
-use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -43,13 +42,27 @@ pub fn calculate_day_five(file: File, debug: bool) -> u64 {
     build_groups(file_lines, &mut groups, &mut seeds, debug);
 
     // Then calculate the result
-    final_result = solution_parse_each_value(groups, seeds, debug);
+    final_result = solution_going_in_reverse(groups, seeds, debug);
 
     if debug { println!("Results {:?}", final_result)}
 
     return final_result as u64;
 }
 
+/// This one aims to tackle the problem a different way
+/// It goes up the tree and builds a separate set of ranges
+/// Then goes through the ranged seeds to find the place it may be
+/// Then it calls the function to find the minimum in that block
+fn solution_going_in_reverse(groups: Groups, seeds: Vec<usize>, debug: bool) -> usize {
+
+    //
+
+    return 0;
+}
+
+/// Uses multi threading, very rudimentary and overall the performance is trash
+/// goes through the entire range and that is taking well over a few min to run
+/// at least the multi threading parse and runs ¯\_(ツ)_/¯
 fn solution_parse_each_value(groups: Groups, seeds: Vec<usize>, debug: bool) -> usize {
     let pairs = (seeds.len()) / 2;
     println!("Pairs: {:?}", &pairs);
