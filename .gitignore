@@ -2,3 +2,4 @@
 /advent23/target/
 .DS_STORE
 /advent23/supp_docs/*
+/supp_docs/*/*.txt
