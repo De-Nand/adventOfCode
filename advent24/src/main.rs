@@ -3,15 +3,12 @@ use std::fs::File;
 
 fn main() {
     let debug: bool = true;
-    let puzzle_day = 1;
-    let puzzle_sample: bool = true;
+    let puzzle_day: u8 = 1;
+    let puzzle_sample: bool = false;
 
-    let puzzle_input: String = get_file_to_read(puzzle_day, puzzle_sample);
-
-    let read_result = read_file(puzzle_input);
-
+    let read_result = read_file(puzzle_sample, puzzle_day);
     match read_result {
-        Ok(fill) => match puzzle_day {
+        Ok(file) => match puzzle_day {
             1 => println!("Final result = {}", calculate_result(file, debug)),
             _ => println!("No valid day selected"),
         },
@@ -21,8 +18,13 @@ fn main() {
     }
 }
 
-fn read_file(file_name: String) -> Result<File, String> {
-    let location: String = format!("supp_docs/{}", file_name);
+fn read_file(sample: bool, day: u8) -> Result<File, String> {
+    let location: String;
+    if sample {
+        location = format!("supp_docs/day{}/sample.txt", day);
+    } else {
+        location = format!("supp_docs/day{}/puzzle.txt", day);
+    }
     let file = File::open(location);
 
     match file {
@@ -33,11 +35,4 @@ fn read_file(file_name: String) -> Result<File, String> {
             return Err(format!("Failed to find the file {:?}", e));
         }
     }
-}
-
-fn get_file_to_read(day: number, sample: bool) -> String {
-    if sample {
-        return format!("day_{}_sample", day);
-    }
-    return format!("day_{}", day);
 }

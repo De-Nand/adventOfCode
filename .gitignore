@@ -3,4 +3,6 @@
 .DS_STORE
 /advent23/supp_docs/*
 /supp_docs/*/*.txt
-/advent24/target/
+/advent24/target
+/advent24/supp_docs/*/*.txt
+/advent24/target
